@@ -15,6 +15,5 @@ enum TaskStatus {
     id: number;
     status: TaskStatus;
     title: string;
-    labels: TaskLabel[];
-    deadline?: Date;
+    labels?: TaskLabel[];
   }
