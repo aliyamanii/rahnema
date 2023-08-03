@@ -104,7 +104,10 @@ ul li {
   border: 2px solid black;
   border-radius: 10px;
   display: flex;
-  background: #bee2df;
+}
+
+.done {
+  text-decoration: line-through;
 }
 
 ul li:first-child {
@@ -189,4 +192,20 @@ ul li:first-child {
 .right {
   display: flex;
   align-items: center;
+}
+
+.remove__button {
+  background-color: red;
+  color: white;
+  border: none;
+  outline: none;
+  padding: 7px 13px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 40px;
+  margin-right: 5px;
+}
+
+.remove__button:hover {
+  background-color: #c80000;
 }
