@@ -1,101 +1,115 @@
-var taskList = [];
-function addTask() {
-  var titleInput = document.querySelector(".task-input");
-  var stateInput = document.querySelector(".state-input");
-  var labelInput = document.querySelector(".label-input");
-  var title = titleInput.value.trim();
-  var state = stateInput.value;
-  var label = labelInput.value.trim();
-  if (title === "") return;
-  var newTask = { title: title, state: state, label: label };
-  taskList.push(newTask);
-  renderTasks();
-  clearInputFields();
+var tasks = [];
+function addTask(title) {
+  var newTask = {
+    title: title,
+    status: "todo",
+  };
+  tasks.push(newTask);
 }
 function removeTask(index) {
-  taskList.splice(index, 1);
-  renderTasks();
+  tasks.splice(index, 1);
 }
-function renderTasks() {
-  var taskListElement = document.getElementById("taskList");
-  taskListElement.innerHTML = "";
-  taskList.forEach(function (task, index) {
-    var listItem = document.createElement("li");
-    listItem.innerHTML = "\n        <span>"
-      .concat(
-        task.title,
-        '</span>\n        <button class="remove-button" onclick="removeTask('
-      )
-      .concat(
-        index,
-        ')">Remove</button>\n        <select class="status-dropdown" onchange="changeTaskState('
-      )
-      .concat(index, ', this.value)">\n          <option value="todo"')
-      .concat(
-        task.state === "todo" ? " selected" : "",
-        '>Todo</option>\n          <option value="doing"'
-      )
-      .concat(
-        task.state === "doing" ? " selected" : "",
-        '>Doing</option>\n          <option value="done"'
-      )
-      .concat(
-        task.state === "done" ? " selected" : "",
-        '>Done</option>\n        </select>\n        <span class="label">'
-      )
-      .concat(task.label, "</span>\n      ");
-    taskListElement.appendChild(listItem);
-  });
+function updateTaskStatus(index, status) {
+  tasks[index].status = status;
 }
-function changeTaskState(index, newState) {
-  taskList[index].state = newState;
+function addLabel(index, label) {
+  if (!tasks[index].labels) {
+    tasks[index].labels = [];
+  }
+  tasks[index].labels.push(label);
 }
-function filterTasks() {
-  var filterInput = document.querySelector(".search-input");
-  var filterValue = filterInput.value.trim().toLowerCase();
-  var filteredTasks = taskList.filter(function (task) {
+function removeLabel(index, label) {
+  if (tasks[index].labels) {
+    tasks[index].labels = tasks[index].labels.filter(function (l) {
+      return l !== label;
+    });
+  }
+}
+function filterTasks(filter) {
+  var filteredTasks = tasks.filter(function (task) {
     return (
-      task.title.toLowerCase().includes(filterValue) ||
-      task.state.toLowerCase().includes(filterValue) ||
-      task.label.toLowerCase().includes(filterValue)
+      task.title.toLowerCase().includes(filter.toLowerCase()) ||
+      task.status.toLowerCase().includes(filter.toLowerCase()) ||
+      (task.labels &&
+        task.labels.some(function (label) {
+          return label.toLowerCase().includes(filter.toLowerCase());
+        }))
     );
   });
-  var taskListElement = document.getElementById("taskList");
-  taskListElement.innerHTML = "";
-  filteredTasks.forEach(function (task, index) {
-    var listItem = document.createElement("li");
-    listItem.innerHTML = "\n        <span>"
-      .concat(
-        task.title,
-        '</span>\n        <button class="remove-button" onclick="removeTask('
-      )
-      .concat(
-        index,
-        ')">Remove</button>\n        <select class="status-dropdown" onchange="changeTaskState('
-      )
-      .concat(index, ', this.value)">\n          <option value="todo"')
-      .concat(
-        task.state === "todo" ? " selected" : "",
-        '>Todo</option>\n          <option value="doing"'
-      )
-      .concat(
-        task.state === "doing" ? " selected" : "",
-        '>Doing</option>\n          <option value="done"'
-      )
-      .concat(
-        task.state === "done" ? " selected" : "",
-        '>Done</option>\n        </select>\n        <span class="label">'
-      )
-      .concat(task.label, "</span>\n      ");
-    taskListElement.appendChild(listItem);
+  renderTasks(filteredTasks);
+}
+function renderTasks(taskList) {
+  var listContainer = document.querySelector(".list__container");
+  listContainer.innerHTML = "";
+  taskList.forEach(function (task, index) {
+    var li = document.createElement("li");
+    li.classList.add("task-item");
+    var leftDiv = document.createElement("div");
+    leftDiv.classList.add("left");
+    var checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.classList.add("checkbox");
+    checkbox.addEventListener("change", function () {
+      return updateTaskStatus(index, checkbox.checked ? "done" : "todo");
+    });
+    var title = document.createTextNode(task.title);
+    leftDiv.appendChild(checkbox);
+    leftDiv.appendChild(title);
+    li.appendChild(leftDiv);
+    if (task.labels) {
+      task.labels.forEach(function (label) {
+        var labelCheckbox = document.createElement("input");
+        labelCheckbox.type = "checkbox";
+        labelCheckbox.classList.add(
+          "checkbox",
+          "".concat(label.toLowerCase(), "-checkbox")
+        );
+        labelCheckbox.addEventListener("change", function () {
+          return labelCheckbox.checked
+            ? addLabel(index, label)
+            : removeLabel(index, label);
+        });
+        li.appendChild(labelCheckbox);
+      });
+    }
+    var dropdown = document.createElement("select");
+    dropdown.classList.add("status-dropdown");
+    dropdown.addEventListener("change", function () {
+      return updateTaskStatus(index, dropdown.value);
+    });
+    var todoOption = document.createElement("option");
+    todoOption.value = "todo";
+    todoOption.text = "Todo";
+    var doingOption = document.createElement("option");
+    doingOption.value = "doing";
+    doingOption.text = "Doing";
+    var doneOption = document.createElement("option");
+    doneOption.value = "done";
+    doneOption.text = "Done";
+    dropdown.appendChild(todoOption);
+    dropdown.appendChild(doingOption);
+    dropdown.appendChild(doneOption);
+    li.appendChild(dropdown);
+    listContainer.appendChild(li);
   });
 }
-function clearInputFields() {
-  var titleInput = document.querySelector(".task-input");
-  var labelInput = document.querySelector(".label-input");
-  titleInput.value = "";
-  labelInput.value = "";
-}
+// Add event listeners for adding tasks and filtering
 document.addEventListener("DOMContentLoaded", function () {
-  renderTasks();
+  var addButton = document.querySelector(".add__button");
+  var searchInput = document.querySelector(".search__input");
+  addButton.addEventListener("click", function () {
+    var inputBar = document.querySelector(".input__bar");
+    var taskTitle = inputBar.value.trim();
+    if (taskTitle !== "") {
+      addTask(taskTitle);
+      inputBar.value = "";
+      renderTasks(tasks);
+    }
+  });
+  searchInput.addEventListener("input", function () {
+    var searchFilter = searchInput.value.trim();
+    filterTasks(searchFilter);
+  });
 });
+// Initial render of tasks
+renderTasks(tasks);
