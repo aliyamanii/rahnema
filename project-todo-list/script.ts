@@ -107,7 +107,6 @@ interface Task {
     });
   }
   
-  // Add event listeners for adding tasks and filtering
   document.addEventListener('DOMContentLoaded', () => {
     const addButton = document.querySelector('.add__button');
     const searchInput = document.querySelector('.search__input');
@@ -128,6 +127,5 @@ interface Task {
     });
   });
   
-  // Initial render of tasks
   renderTasks(tasks);
   
