@@ -1,7 +1,7 @@
 interface Task {
     title: string;
     status: 'todo' | 'doing' | 'done';
-    labels?: string[];
+    labels: string[];
   }
   
   let tasks: Task[] = [];
@@ -9,7 +9,8 @@ interface Task {
   function addTask(title: string) {
     const newTask: Task = {
       title: title,
-      status: 'todo'
+      status: 'todo',
+      labels: []
     };
     tasks.push(newTask);
   }
@@ -23,9 +24,6 @@ interface Task {
   }
   
   function addLabel(index: number, label: string) {
-    if (!tasks[index].labels) {
-      tasks[index].labels = [];
-    }
     tasks[index].labels.push(label);
   }
   
@@ -46,7 +44,7 @@ interface Task {
   }
   
   function renderTasks(taskList: Task[]) {
-    const listContainer = document.querySelector('.list__container');
+    const listContainer = document.querySelector('.list__container')!;
     listContainer.innerHTML = '';
   
     taskList.forEach((task, index) => {
@@ -108,11 +106,11 @@ interface Task {
   }
   
   document.addEventListener('DOMContentLoaded', () => {
-    const addButton = document.querySelector('.add__button');
-    const searchInput = document.querySelector('.search__input');
+    const addButton = document.querySelector('.add__button')!;
+    const searchInput = document.querySelector('.search__input') as HTMLInputElement;
   
     addButton.addEventListener('click', () => {
-      const inputBar = document.querySelector('.input__bar');
+      const inputBar = document.querySelector('.input__bar') as HTMLInputElement;
       const taskTitle = inputBar.value.trim();
       if (taskTitle !== '') {
         addTask(taskTitle);
