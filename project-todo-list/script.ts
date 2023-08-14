@@ -1,7 +1,11 @@
+type Label = "Red" | "Green" | "Blue" | "Yellow";
+
+type Status = 'todo' | 'doing' | 'done';
+
 interface Task {
     title: string;
-    status: 'todo' | 'doing' | 'done';
-    labels: string[];
+    status: Status;
+    labels: Label[];
   }
   
   let tasks: Task[] = [];
@@ -19,11 +23,11 @@ interface Task {
     tasks.splice(index, 1);
   }
   
-  function updateTaskStatus(index: number, status: 'todo' | 'doing' | 'done') {
+  function updateTaskStatus(index: number, status: Status) {
     tasks[index].status = status;
   }
   
-  function addLabel(index: number, label: string) {
+  function addLabel(index: number, label: Label) {
     tasks[index].labels.push(label);
   }
   
@@ -54,14 +58,14 @@ interface Task {
       const leftDiv = document.createElement('div');
       leftDiv.classList.add('left');
   
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.classList.add('checkbox');
-      checkbox.addEventListener('change', () => updateTaskStatus(index, checkbox.checked ? 'done' : 'todo'));
+      const removeButton = document.createElement('button');
+      removeButton.textContent = 'Remove';
+      removeButton.classList.add('remove__button');
+      removeButton.addEventListener('change', () => updateTaskStatus(index, removeButton.onclick ? 'done' : 'todo'));
   
       const title = document.createTextNode(task.title);
   
-      leftDiv.appendChild(checkbox);
+      leftDiv.appendChild(removeButton);
       leftDiv.appendChild(title);
   
       li.appendChild(leftDiv);
