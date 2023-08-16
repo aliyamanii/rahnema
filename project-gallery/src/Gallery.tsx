@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Gallery.css";
 
-const App: React.FC = () => {
+const Gallery: React.FC = () => {
   interface Photo {
     id: number;
     category: string;
@@ -17,7 +17,6 @@ const App: React.FC = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [filteredPhotos, setFilteredPhotos] = useState<Photo[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedImage, setSelectedImage] = useState("");
 
@@ -32,34 +31,6 @@ const App: React.FC = () => {
       .then((data) => setCategories(data))
       .catch((error) => console.error("Error fetching categories:", error));
   }, []);
-
-  useEffect(() => {
-    // Filter photos based on the selected category
-    if (selectedCategory === "") {
-      setFilteredPhotos(photos);
-    } else {
-      const filtered = photos.filter(
-        (photo) => photo.category === selectedCategory
-      );
-      setFilteredPhotos(filtered);
-    }
-  }, [selectedCategory, photos]);
-
-  useEffect(() => {
-    // Filter photos based on the search query
-    if (searchQuery === "") {
-      setFilteredPhotos(photos);
-    } else {
-      const filtered = photos.filter(
-        (photo) =>
-          photo.id.toString().includes(searchQuery) ||
-          photo.category.includes(searchQuery) ||
-          photo.photographer.includes(searchQuery) ||
-          photo.alt.includes(searchQuery)
-      );
-      setFilteredPhotos(filtered);
-    }
-  }, [searchQuery, photos]);
 
   return (
     <div className="App">
@@ -106,18 +77,27 @@ const App: React.FC = () => {
 
         <section className="panel">
           <div className="panel__top">
-            <h1 className="first-heading">Images</h1>
+            <h1 className="first-heading">{selectedCategory}</h1>
           </div>
           <div className="panel__images">
-            {filteredPhotos.map((photo: any) => (
-              <img
-                key={photo.id}
-                className="panel__img"
-                src={photo.url}
-                alt={photo.alt}
-                onClick={() => setSelectedImage(photo.url)}
-              />
-            ))}
+            {photos
+              .filter(
+                (photo) =>
+                  photo.category === selectedCategory ||
+                  photo.id.toString().includes(searchQuery) ||
+                  photo.category.includes(searchQuery) ||
+                  photo.photographer.includes(searchQuery) ||
+                  photo.alt.includes(searchQuery)
+              )
+              .map((photo: Photo) => (
+                <img
+                  key={photo.id}
+                  className="panel__img"
+                  src={photo.url}
+                  alt={photo.alt}
+                  onClick={() => setSelectedImage(photo.url)}
+                />
+              ))}
           </div>
         </section>
 
@@ -139,4 +119,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default Gallery;
