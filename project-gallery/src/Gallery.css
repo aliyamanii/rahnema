@@ -313,6 +313,7 @@ button {
   max-height: 100%;
   overflow: hidden;
   border: 1px solid #ccc;
+  animation: fade-in 1s;
 }
 
 .canvas__img {
