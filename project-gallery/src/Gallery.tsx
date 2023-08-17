@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from "react";
+import Header from "./components/Header";
+import Sidebar from "./components/Sidebar";
+import Panel from "./components/Panel";
+import Canvas from "./components/Canvas";
 import "./Gallery.css";
 
-const Gallery: React.FC = () => {
-  interface Photo {
-    id: number;
-    category: string;
-    url: string;
-    photographer: string;
-    alt: string;
-    page_url: string;
-    width: number;
-    height: number;
-    path: string;
-  }
+import { Photo } from "./types/types";
 
+const Gallery: React.FC = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -32,88 +26,34 @@ const Gallery: React.FC = () => {
       .catch((error) => console.error("Error fetching categories:", error));
   }, []);
 
+  const filteredPhotos = photos.filter(
+    (photo) =>
+      (selectedCategory === "" || photo.category === selectedCategory) &&
+      (searchQuery === "" ||
+        photo.id.toString().includes(searchQuery) ||
+        photo.category.includes(searchQuery) ||
+        photo.photographer.includes(searchQuery) ||
+        photo.alt.includes(searchQuery))
+  );
+
   return (
     <div className="App">
-      <header className="header">
-        <h1 className="logo"> Gallerie </h1>
-        <form className="search-form">
-          <input
-            type="text"
-            name="search-bar"
-            className="search-bar"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-          />
-        </form>
-      </header>
+      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
       <div className="app__container">
-        <div className="sidebar">
-          <section className="menu">
-            <button
-              className={`menu__button ${
-                selectedCategory === "" ? "menu__button--active" : ""
-              }`}
-              onClick={() => setSelectedCategory("")}
-            >
-              <i className="fas fa-layer-group menu__icon"></i>
-              <span className="menu__text">All</span>
-            </button>
-            {categories.map((category) => (
-              <button
-                key={category}
-                className={`menu__button ${
-                  selectedCategory === category ? "menu__button--active" : ""
-                }`}
-                onClick={() => setSelectedCategory(category)}
-              >
-                <i className="fas fa-layer-group menu__icon"></i>
-                <span className="menu__text">{category}</span>
-              </button>
-            ))}
-          </section>
-        </div>
+        <Sidebar
+          categories={categories}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
 
-        <section className="panel">
-          <div className="panel__top">
-            <h1 className="first-heading">{selectedCategory}</h1>
-          </div>
-          <div className="panel__images">
-            {photos
-              .filter(
-                (photo) =>
-                  photo.category === selectedCategory ||
-                  photo.id.toString().includes(searchQuery) ||
-                  photo.category.includes(searchQuery) ||
-                  photo.photographer.includes(searchQuery) ||
-                  photo.alt.includes(searchQuery)
-              )
-              .map((photo: Photo) => (
-                <img
-                  key={photo.id}
-                  className="panel__img"
-                  src={photo.url}
-                  alt={photo.alt}
-                  onClick={() => setSelectedImage(photo.url)}
-                />
-              ))}
-          </div>
-        </section>
+        <Panel
+          selectedCategory={selectedCategory}
+          filteredPhotos={filteredPhotos}
+          setSelectedImage={setSelectedImage}
+        />
 
-        <main className="main">
-          <div className="artboard">
-            <section className="canvas">
-              {selectedImage && (
-                <img
-                  className="canvas__img"
-                  src={selectedImage}
-                  alt="Selected Large Image"
-                />
-              )}
-            </section>
-          </div>
-        </main>
+        <Canvas selectedImage={selectedImage} />
       </div>
     </div>
   );
